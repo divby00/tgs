@@ -11,10 +11,19 @@ int main(int argc, char** argv) {
     TGS_LOGGER* logger = logger_init(NULL, LVL_INFO);
     logger->log(logger, "Testing message", LVL_INFO);
 
-    TGS_LLIST* list = list_init(&string_init, &string_free);
+    fprintf(stdout, "\nAdding 3 elements to linked list");
+    TGS_LINKED_LIST* list = list_init(&string_init, &string_free);
     list->add(list, "String01");
     list->add(list, "String02");
     list->add(list, "String03");
+    fprintf(stdout, "\nList Size: %d", list->size);
+    TGS_LIST_NODE* node = list->get(list, 2);
+    fprintf(stdout, "\nData in index 2: %s", (char*)node->object);
+    fprintf(stdout, "\nRemoving index 1...");
+    list->remove(list, 0);
+    list->remove(list, 2);
+    list->remove(list, 0);
+    fprintf(stdout, "\nShowing list...\n");
     list_view(list);
     list_quit(list);
 
