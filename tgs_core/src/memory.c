@@ -13,5 +13,6 @@ void* memalloc(uint size) {
 void memfree(void* data) {
     if (data != NULL) {
         free(data);
+        data = NULL;
     }
 }
