@@ -1,10 +1,10 @@
 #include "memory.h"
-#include "list.h"
+#include "linkedlist.h"
 
 
 TGS_LINKED_LIST* list_init(void* (*object_init_function)(void* params), void (*object_free_function)(void* params)) {
     TGS_LINKED_LIST* list = NULL;
-    list = (struct TGS_LINKED_LIST*)memalloc(sizeof(TGS_LINKED_LIST));
+    list = _memalloc(sizeof(TGS_LINKED_LIST));
     if (list != NULL) {
         list->node = NULL;
         list->size = 0;
@@ -25,15 +25,15 @@ void list_quit(TGS_LINKED_LIST* list) {
             TGS_LIST_NODE* prev = node;
             node = node->next;
             list->object_free(prev->object);
-            memfree(prev);
+            _memfree(prev);
         }
-        memfree(list);
+        _memfree(list);
     }
 }
 
 void* list_add_at_init(TGS_LINKED_LIST* list, void* init_function_params) {
     TGS_LIST_NODE* aux = NULL;
-    aux = (struct TGS_LIST_NODE*)memalloc(sizeof(TGS_LIST_NODE));
+    aux = _memalloc(sizeof(TGS_LIST_NODE));
     if (aux != NULL) {
         aux->object = list->object_init(init_function_params);
         aux->next = NULL;
@@ -54,7 +54,7 @@ void* list_add_at_init(TGS_LINKED_LIST* list, void* init_function_params) {
 void* list_add(TGS_LINKED_LIST* list, void* init_function_params) {
     TGS_LIST_NODE* aux = NULL;
     TGS_LIST_NODE* node = list->node;
-    aux = (struct TGS_LIST_NODE*)memalloc(sizeof(TGS_LIST_NODE));
+    aux = _memalloc(sizeof(TGS_LIST_NODE));
     if (aux != NULL) {
         aux->object = list->object_init(init_function_params);
         aux->next = NULL;
@@ -72,14 +72,14 @@ void* list_add(TGS_LINKED_LIST* list, void* init_function_params) {
     return aux->object;
 }
 
-bool list_remove(TGS_LINKED_LIST* list, void *remove_function_params) {
+unsigned char list_remove(TGS_LINKED_LIST* list, void *remove_function_params) {
     TGS_LIST_NODE* node = list->node;
     TGS_LIST_NODE* prev = NULL;
 
     if (node->object == remove_function_params) {
         list->node = node->next;
         list->object_free(node->object);
-        memfree(node);
+        _memfree(node);
         list->size--;
         return 1;
     } else {
@@ -90,7 +90,7 @@ bool list_remove(TGS_LINKED_LIST* list, void *remove_function_params) {
                 if (node->object == remove_function_params) {
                     prev->next = node->next;
                     list->object_free(node->object);
-                    memfree(node);
+                    _memfree(node);
                     list->size--;
                     return 1;
                 }
@@ -110,6 +110,7 @@ void list_view(TGS_LINKED_LIST* list) {
     }
 }
 
-bool list_is_empty(TGS_LINKED_LIST *list) {
+
+unsigned char list_is_empty(TGS_LINKED_LIST *list) {
     return !(list != NULL && list->node != NULL);
 }

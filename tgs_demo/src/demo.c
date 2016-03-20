@@ -1,33 +1,30 @@
 #include <stdio.h>
 #include "memory.h"
-#include "typealias.h"
-#include "logger.h"
-#include "list.h"
-
-void* string_init(void* params);
-void string_free(void *params);
+#include "memalloc.h"
+#include "hashtable.h"
+#include "display.h"
+#include <sys/time.h>
 
 int main(int argc, char** argv) {
-    TGS_LOGGER* logger = logger_init(NULL, LVL_INFO);
-    logger->log(logger, "Testing message", LVL_INFO);
-    TGS_LINKED_LIST* list = list_init(&string_init, &string_free);
-    void* s1 = list->add(list, "String01");
-    list->add_at_init(list, "String02");
-    fprintf(stdout, "List Size: %d\n", list->size);
-    list->remove(list, s1);
-    list_view(list);
-    list_quit(list);
-    logger_quit(logger);
+    TGS_HASHTABLE* table = hashtable_init(256);
+    struct timeval stop, start;
+    double secs;
+
+    gettimeofday(&start, NULL);
+    table->put(table, "18", "eighteen");
+    table->put(table, "19", "nineteen");
+    gettimeofday(&stop, NULL);
+    secs = (double)(stop.tv_usec - start.tv_usec) / 1000000 + (double)(stop.tv_sec - start.tv_sec);
+    fprintf(stdout, "Took %f\n", secs);
+
+    gettimeofday(&start, NULL);
+    char* data00 = table->get(table, "19");
+    char* data01 = table->get(table, "18");
+    gettimeofday(&stop, NULL);
+    secs = (double)(stop.tv_usec - start.tv_usec) / 1000000 + (double)(stop.tv_sec - start.tv_sec);
+    fprintf(stdout, "Took %f\n", secs);
+
+    hashtable_quit(table);
+
     return 0;
 }
-
-void* string_init(void* params) {
-    char* buffer = (char*)memalloc(1024);
-    strcpy(buffer, params);
-    return buffer;
-}
-
-void string_free(void* params) {
-    memfree(params);
-}
-

@@ -9,9 +9,9 @@
 
 TGS_LOGGER* logger_init(char* filename, log_level level) {
     TGS_LOGGER* logger = NULL;
-    logger = (struct TGS_LOGGER*)memalloc(sizeof(struct TGS_LOGGER));
+    logger = _memalloc(sizeof(struct TGS_LOGGER));
     if (!is_empty(filename)) {
-        logger->filename = (char *)memalloc(MAXSTRING);
+        logger->filename = _memalloc(MAXSTRING);
         strcpy(logger->filename, filename);
         logger->file = fopen(logger->filename, "wt");
         if (logger->file == NULL) {
@@ -33,8 +33,8 @@ void logger_quit(TGS_LOGGER* logger) {
             fclose(logger->file);
         }
     }
-    memfree(logger->filename);
-    memfree(logger);
+    _memfree(logger->filename);
+    _memfree(logger);
 }
 
 void logger_set_level(TGS_LOGGER* logger, log_level level) {
@@ -52,17 +52,17 @@ void logger_log(TGS_LOGGER* logger, char* msg, log_level level) {
 
     if (level > logger->selected_level) return;
 
-    buffer = (char*)memalloc(MAXSTRING);
+    buffer = _memalloc(MAXSTRING);
     if (buffer != NULL) {
         if (gettimeofday(&tv, NULL) != -1) {
             if ((tm = localtime(&tv.tv_sec)) != NULL) {
-                datestr = (char*)memalloc(MAXSTRING);
+                datestr = _memalloc(MAXSTRING);
                 strftime(datestr, MAXSTRING, "%d-%b-%Y %H:%M:%S", tm);
                 sprintf(buffer, "[%s - %s] %s\n", datestr, levelstr[logger->selected_level], msg);
-                memfree(datestr);
+                _memfree(datestr);
             }
         }
         fprintf(logger->file, "%s", buffer);
-        memfree(buffer);
+        _memfree(buffer);
     }
 }
