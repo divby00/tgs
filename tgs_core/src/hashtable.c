@@ -17,12 +17,13 @@ TGS_HASHTABLE* hashtable_init(uint32_t size) {
         hashtable->size = size;
         hashtable->put = hashtable_put;
         hashtable->get = hashtable_get;
+        hashtable->hash = pearson_hash;
     }
     return hashtable;
 }
 
 
-static uint32_t pearson_hash(char* str, unsigned int len) {
+uint32_t pearson_hash(char* str, unsigned int len) {
     size_t i;
     static const unsigned char T[256] = {
         59,153, 29,  9,213,167, 84, 93, 30, 46, 94, 75,151,114, 73,222,
@@ -51,7 +52,7 @@ static uint32_t pearson_hash(char* str, unsigned int len) {
 }
 
 /*
-uint32_t bkdr_hash(TGS_HASHTABLE* hashtable, char* str, unsigned int len) {
+uint32_t bkdr_hash(char* str, unsigned int len) {
    uint32_t hash = 0;
    uint32_t i = 0;
    for(i=0; i<len; str++, i++) {
@@ -62,7 +63,7 @@ uint32_t bkdr_hash(TGS_HASHTABLE* hashtable, char* str, unsigned int len) {
 */
 
 
-TGS_HASHTABLE_ENTRY* hashtable_entry_create(char* key, char* value) {
+static TGS_HASHTABLE_ENTRY* hashtable_entry_create(char* key, void* params_create, void* (*create)(void *params), void (*destroy)(void *params)) {
     TGS_HASHTABLE_ENTRY* entry = NULL;
     if (key != NULL) {
         entry = _memalloc(sizeof(TGS_HASHTABLE_ENTRY));
@@ -70,10 +71,8 @@ TGS_HASHTABLE_ENTRY* hashtable_entry_create(char* key, char* value) {
             entry->key = _memalloc(sizeof(char)*strlen(key)+1);
             if (entry->key != NULL) {
                 strcpy(entry->key, key);
-                entry->value = _memalloc(sizeof(char)*strlen(value)+1);
-                if (entry->value != NULL) {
-                    strcpy(entry->value, value);
-                }
+                entry->value = create(params_create);
+                entry->destroy = destroy;
             }
             entry->next = NULL;
         }
@@ -81,13 +80,12 @@ TGS_HASHTABLE_ENTRY* hashtable_entry_create(char* key, char* value) {
     return entry;
 }
 
-
-void hashtable_put(TGS_HASHTABLE* hashtable, char* key, char* value) {
+void hashtable_put(TGS_HASHTABLE* hashtable, char* key, void* params_create, void* (*create)(void *params), void (*destroy)(void *params)) {
     uint32_t hashcode = 0;
     TGS_HASHTABLE_ENTRY* entry = NULL;
     TGS_HASHTABLE_ENTRY* next = NULL;
     TGS_HASHTABLE_ENTRY* last = NULL;
-    hashcode = pearson_hash(key, strlen(key));
+    hashcode = hashtable->hash(key, strlen(key));
     next = hashtable->table[hashcode];
 
     while(next!=NULL && next->key!=NULL && strcmp(key, next->key) > 0) {
@@ -97,12 +95,9 @@ void hashtable_put(TGS_HASHTABLE* hashtable, char* key, char* value) {
 
     if( next != NULL && next->key != NULL && strcmp(key, next->key) == 0) {
         free(next->value);
-        next->value = _memalloc(sizeof(char)*strlen(value)+1);
-        if (next->value != NULL) {
-            strcpy(next->value, value);
-        }
+        next->value = create(params_create);
     } else {
-        entry = hashtable_entry_create(key, value);
+        entry = hashtable_entry_create(key, params_create, create, destroy);
         if (next == hashtable->table[hashcode]) {
             entry->next = next;
             hashtable->table[hashcode] = entry;
@@ -119,7 +114,7 @@ void hashtable_put(TGS_HASHTABLE* hashtable, char* key, char* value) {
 char* hashtable_get(TGS_HASHTABLE* hashtable, char* key) {
     uint32_t hashcode = 0;
     TGS_HASHTABLE_ENTRY* entry = NULL;
-    hashcode = pearson_hash(key, strlen(key));
+    hashcode = hashtable->hash(key, strlen(key));
 
     entry = hashtable->table[hashcode];
     while(entry != NULL && entry->key != NULL && strcmp(key, entry->key) > 0) {
@@ -146,7 +141,7 @@ void hashtable_quit(TGS_HASHTABLE* hashtable) {
                 aux = entry;
                 entry = entry->next;
                 aux->next = NULL;
-                _memfree(aux->value);
+                aux->destroy(aux->value);
                 _memfree(aux->key);
                 _memfree(aux);
             }
