@@ -6,17 +6,16 @@
 #include "display.h"
 #include <sys/time.h>
 
-void* hashtable_create_entry(void* params);
-void hashtable_destroy_entry(void* params);
 
 int main(int argc, char** argv) {
-    TGS_HASHTABLE* table = hashtable_init(256);
+    TGS_HASHTABLE* table = hashtable_init_small();
     struct timeval stop, start;
     double secs;
 
     gettimeofday(&start, NULL);
-    table->put(table, "18", "eighteen", hashtable_create_entry, hashtable_destroy_entry);
-    table->put(table, "19", "nineteen", hashtable_create_entry, hashtable_destroy_entry);
+    table->put(table, "17", "seventeen", table->string_create, table->string_destroy);
+    table->put(table, "18", "eighteen", table->string_create, table->string_destroy);
+    table->put(table, "19", "nineteen", table->string_create, table->string_destroy);
     gettimeofday(&stop, NULL);
     secs = (double)(stop.tv_usec - start.tv_usec) / 1000000 + (double)(stop.tv_sec - start.tv_sec);
     fprintf(stdout, "Took %f\n", secs);
@@ -31,18 +30,15 @@ int main(int argc, char** argv) {
     fprintf(stdout, "\n%s", data00);
     fprintf(stdout, "\n%s", data01);
 
+    table->remove(table, "19");
+    fprintf(stdout, "\nExit: %d", table->contains(table, "19"));
+
+    fprintf(stdout, "\nExit: %d", table->contains(table, "17"));
+
+    table->remove(table, "18");
+    fprintf(stdout, "\nExit: %d", table->contains(table, "18"));
+
     hashtable_quit(table);
 
     return 0;
-}
-
-void* hashtable_create_entry(void* params) {
-    char* buffer = NULL;
-    buffer = _memalloc(sizeof(char)*(strlen(params)+1));
-    strcpy(buffer, params);
-    return buffer;
-}
-
-void hashtable_destroy_entry(void* params) {
-    _memfree(params);
 }

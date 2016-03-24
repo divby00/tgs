@@ -3,27 +3,7 @@
 #include "hashtable.h"
 
 
-TGS_HASHTABLE* hashtable_init(uint32_t size) {
-    TGS_HASHTABLE* hashtable = NULL;
-    if (size < 1) return NULL;
-    hashtable = _memalloc(sizeof(TGS_HASHTABLE));
-    if (hashtable != NULL) {
-        hashtable->table = _memalloc(sizeof(TGS_HASHTABLE_ENTRY*) * size);
-        if (hashtable->table != NULL) {
-            for(uint32_t i=0; i < size; i++) {
-                hashtable->table[i] = NULL;
-            }
-        }
-        hashtable->size = size;
-        hashtable->put = hashtable_put;
-        hashtable->get = hashtable_get;
-        hashtable->hash = pearson_hash;
-    }
-    return hashtable;
-}
-
-
-uint32_t pearson_hash(char* str, unsigned int len) {
+uint16_t pearson_hash(char* str, uint32_t len) {
     size_t i;
     static const unsigned char T[256] = {
         59,153, 29,  9,213,167, 84, 93, 30, 46, 94, 75,151,114, 73,222,
@@ -44,23 +24,63 @@ uint32_t pearson_hash(char* str, unsigned int len) {
         238, 87,240,155,180,170,242,212,191,163, 78,218,137,194,175,110
     };
 
-    unsigned char h = T[str[0] % 256];
+    uint8_t h = T[str[0] % 256];
     for (i = 1; i < len; i++) {
         h = T[h ^ str[i]];
     }
     return h;
 }
 
-/*
-uint32_t bkdr_hash(char* str, unsigned int len) {
-   uint32_t hash = 0;
+
+uint16_t bkdr_hash(char* str, uint32_t len) {
+   uint16_t hash = 0;
    uint32_t i = 0;
    for(i=0; i<len; str++, i++) {
       hash = ((hash << 5) - hash) + (*str);
    }
    return hash;
 }
-*/
+
+
+static TGS_HASHTABLE* hashtable_create(enum TGS_HASHTABLE_SIZE size) {
+    TGS_HASHTABLE* hashtable = NULL;
+
+    hashtable = _memalloc(sizeof(TGS_HASHTABLE));
+    if (hashtable != NULL) {
+        if (size == HT_SIZE_NORMAL) {
+            hashtable->size = UINT16_MAX + 1;
+            hashtable->hash = bkdr_hash;
+        } else {
+            hashtable->size = UINT8_MAX + 1;
+            hashtable->hash = pearson_hash;
+        }
+
+        hashtable->table = _memalloc(sizeof(TGS_HASHTABLE_ENTRY*) * hashtable->size);
+        if (hashtable->table != NULL) {
+            for(uint32_t i=0; i < hashtable->size; i++) {
+                hashtable->table[i] = NULL;
+            }
+        }
+
+        hashtable->put = hashtable_put;
+        hashtable->get = hashtable_get;
+        hashtable->remove = hashtable_remove;
+        hashtable->contains = hashtable_contains;
+        hashtable->string_create = hashtable_string_create;
+        hashtable->string_destroy = hashtable_string_destroy;
+    }
+    return hashtable;
+}
+
+
+TGS_HASHTABLE* hashtable_init_small(void) {
+    return hashtable_create(HT_SIZE_SMALL);
+}
+
+
+TGS_HASHTABLE* hashtable_init(void) {
+    return hashtable_create(HT_SIZE_NORMAL);
+}
 
 
 static TGS_HASHTABLE_ENTRY* hashtable_entry_create(char* key, void* params_create, void* (*create)(void *params), void (*destroy)(void *params)) {
@@ -80,8 +100,57 @@ static TGS_HASHTABLE_ENTRY* hashtable_entry_create(char* key, void* params_creat
     return entry;
 }
 
+
+void hashtable_remove(TGS_HASHTABLE* hashtable, char* key) {
+    uint16_t hashcode = 0;
+    TGS_HASHTABLE_ENTRY* entry = NULL;
+    TGS_HASHTABLE_ENTRY* first = NULL;
+    TGS_HASHTABLE_ENTRY* prev = NULL;
+
+    if (hashtable != NULL && key != NULL) {
+
+        hashcode = hashtable->hash(key, strlen(key));
+        entry = hashtable->table[hashcode];
+        first = entry;
+        prev = entry;
+
+        while(entry != NULL && entry->key != NULL && strcmp(key, entry->key) > 0) {
+            prev = entry;
+            entry = entry->next;
+        }
+
+        /* The entry exists and has a valid key and the key is what we are looking for */
+        if (entry != NULL && entry->key != NULL && !strcmp(key, entry->key)) {
+            // It's a first node
+            if (entry == first) {
+                first = entry->next;
+                entry->destroy(entry->value);
+                _memfree(entry->key);
+                _memfree(entry);
+                entry = NULL;
+                hashtable->table[hashcode] = first;
+            // It's the last node
+            } else if (entry->next == NULL) {
+                prev->next = NULL;
+                entry->destroy(entry->value);
+                _memfree(entry->key);
+                _memfree(entry);
+                entry = NULL;
+            // It's an intermediate node
+            } else {
+                prev->next = entry->next;
+                entry->destroy(entry->value);
+                _memfree(entry->key);
+                _memfree(entry);
+                entry = NULL;
+            }
+        }
+    }
+}
+
+
 void hashtable_put(TGS_HASHTABLE* hashtable, char* key, void* params_create, void* (*create)(void *params), void (*destroy)(void *params)) {
-    uint32_t hashcode = 0;
+    uint16_t hashcode = 0;
     TGS_HASHTABLE_ENTRY* entry = NULL;
     TGS_HASHTABLE_ENTRY* next = NULL;
     TGS_HASHTABLE_ENTRY* last = NULL;
@@ -111,8 +180,8 @@ void hashtable_put(TGS_HASHTABLE* hashtable, char* key, void* params_create, voi
 }
 
 
-char* hashtable_get(TGS_HASHTABLE* hashtable, char* key) {
-    uint32_t hashcode = 0;
+void* hashtable_get(TGS_HASHTABLE* hashtable, char* key) {
+    uint16_t hashcode = 0;
     TGS_HASHTABLE_ENTRY* entry = NULL;
     hashcode = hashtable->hash(key, strlen(key));
 
@@ -148,5 +217,29 @@ void hashtable_quit(TGS_HASHTABLE* hashtable) {
         }
         _memfree(hashtable->table);
         _memfree(hashtable);
+        hashtable = NULL;
     }
+}
+
+
+void* hashtable_string_create(void* params) {
+    char* buffer = NULL;
+    if (params != NULL) {
+        buffer = _memalloc(sizeof(char) * (strlen(params) + 1));
+        strcpy(buffer, params);
+    }
+    return buffer;
+}
+
+
+void hashtable_string_destroy(void* params) {
+    if (params != NULL) {
+        _memfree(params);
+        params = NULL;
+    }
+}
+
+
+uint8_t hashtable_contains(TGS_HASHTABLE *hashtable, char *key) {
+    return (hashtable->get(hashtable, key) != NULL);
 }
