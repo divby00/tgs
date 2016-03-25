@@ -1,6 +1,10 @@
+#include <malloc.h>
+#include <stdio.h>
+#include <string.h>
 #include "memory.h"
 
-void* _memalloc(uint32_t size) {
+
+void* memalloc(uint32_t size) {
     void* aux = NULL;
     //aux = _mm_malloc(size, MEMORY_ALIGNMENT);
     aux = malloc(size);
@@ -10,7 +14,8 @@ void* _memalloc(uint32_t size) {
     return aux;
 }
 
-void _memfree(void* data) {
+
+void memfree(void* data) {
     if (data != NULL) {
         free(data);
         data = NULL;

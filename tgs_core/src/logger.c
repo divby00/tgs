@@ -1,47 +1,18 @@
-#include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
+#include <stdarg.h>
+#include <string.h>
+#include <malloc.h>
 #include "logger.h"
-#include "memory.h"
-#include "sizes.h"
-#include "stringutils.h"
 
 
-TGS_LOGGER* logger_init(char* filename, log_level level) {
-    TGS_LOGGER* logger = NULL;
-    logger = _memalloc(sizeof(struct TGS_LOGGER));
-    if (!is_empty(filename)) {
-        logger->filename = _memalloc(MAXSTRING);
-        strcpy(logger->filename, filename);
-        logger->file = fopen(logger->filename, "wt");
-        if (logger->file == NULL) {
-            logger->file = stdout;
-        }
-    } else {
-        logger->file = stdout;
-    }
-    logger->selected_level = level;
-    logger->set_level = logger_set_level;
-    logger->log = logger_log;
-    return logger;
-}
-
-void logger_quit(TGS_LOGGER* logger) {
-    if (!is_empty(logger->filename)) {
-        if (logger->file != NULL) {
-            fflush(logger->file);
-            fclose(logger->file);
-        }
-    }
-    _memfree(logger->filename);
-    _memfree(logger);
-}
-
-void logger_set_level(TGS_LOGGER* logger, log_level level) {
+static void logger_set_level(enum TGS_LOG_LEVEL level) {
     logger->selected_level = level;
 }
 
-void logger_log(TGS_LOGGER* logger, char* msg, log_level level) {
+
+static void logger_log(enum TGS_LOG_LEVEL level, const char* format, ...) {
+    va_list args;
     struct timeval tv;
     struct tm *tm;
     char* buffer = NULL;
@@ -49,20 +20,77 @@ void logger_log(TGS_LOGGER* logger, char* msg, log_level level) {
     const char levelstr[4][6] = {
         "DEBUG", " INFO", " WARN", "ERROR"
     };
+    size_t size = 0;
 
     if (level > logger->selected_level) return;
+    size = sizeof(char) * (strlen(format) + 100);
 
-    buffer = _memalloc(MAXSTRING);
+    buffer = malloc(size);
     if (buffer != NULL) {
+        memset(buffer, 0, size);
         if (gettimeofday(&tv, NULL) != -1) {
             if ((tm = localtime(&tv.tv_sec)) != NULL) {
-                datestr = _memalloc(MAXSTRING);
-                strftime(datestr, MAXSTRING, "%d-%b-%Y %H:%M:%S", tm);
-                sprintf(buffer, "[%s - %s] %s\n", datestr, levelstr[logger->selected_level], msg);
-                _memfree(datestr);
+                datestr = malloc(size);
+                if (datestr != NULL) {
+                    memset(datestr, 0, size);
+                    strftime(datestr, size, "%d-%b-%Y %H:%M:%S", tm);
+                    sprintf(buffer, "[%s - %s] %s\n", datestr, levelstr[logger->selected_level], format);
+                    free(datestr);
+                    datestr = NULL;
+                }
             }
         }
-        fprintf(logger->file, "%s", buffer);
-        _memfree(buffer);
+        va_start(args, format);
+        vfprintf(logger->file, buffer, args);
+        va_end(args);
+        free(buffer);
+        buffer = NULL;
+    }
+}
+
+
+TGS_LOGGER* logger_init(char* filename, enum TGS_LOG_LEVEL level) {
+    logger = NULL;
+    logger = malloc(sizeof(TGS_LOGGER));
+
+    if (logger != NULL) {
+        memset(logger, 0, sizeof(TGS_LOGGER));
+
+        if (filename != NULL && strcmp(filename, "")) {
+            logger->filename = malloc(sizeof(char) * (strlen(filename) + 1));
+            if (logger->filename != NULL) {
+                memset(logger->filename, 0, sizeof(char) * (strlen(filename) + 1));
+                strcpy(logger->filename, filename);
+                logger->file = fopen(logger->filename, "wt");
+                if (logger->file == NULL) {
+                    logger->file = stdout;
+                }
+            }
+        } else {
+            logger->file = stdout;
+        }
+
+        logger->selected_level = level;
+        logger->set_level = logger_set_level;
+        logger->log = logger_log;
+    }
+    return logger;
+}
+
+
+void logger_quit() {
+    if (logger != NULL) {
+        if (logger->filename != NULL && strcmp(logger->filename, "")) {
+            if (logger->file != NULL) {
+                fflush(logger->file);
+                fclose(logger->file);
+            }
+        }
+        if (logger->filename != NULL) {
+            free(logger->filename);
+            logger->filename = NULL;
+        }
+        free(logger);
+        logger = NULL;
     }
 }

@@ -1,26 +1,32 @@
 #ifndef __LOGGER_H__
 #define __LOGGER_H__
 
+
 #include <stdio.h>
 
-typedef enum log_level {
-    LVL_DEBUG,
-    LVL_INFO,
-    LVL_WARN,
-    LVL_ERROR
-} log_level;
+
+enum TGS_LOG_LEVEL {
+    LOG_LEVEL_DEBUG,
+    LOG_LEVEL_INFO,
+    LOG_LEVEL_WARN,
+    LOG_LEVEL_ERROR
+};
+
 
 typedef struct TGS_LOGGER {
-    char* filename;
     FILE* file;
-    log_level selected_level;
-    void (*set_level)(struct TGS_LOGGER* logger, log_level level);
-    void (*log)(struct TGS_LOGGER* logger, char* msg, log_level level);
+    char* filename;
+    enum TGS_LOG_LEVEL selected_level;
+    void (*set_level)(enum TGS_LOG_LEVEL level);
+    void (*log)(enum TGS_LOG_LEVEL level, const char* format, ...);
 } TGS_LOGGER;
 
-TGS_LOGGER* logger_init(char* filename, log_level level);
-void logger_quit(TGS_LOGGER* logger);
-void logger_log(TGS_LOGGER* logger, char* msg, log_level level);
-void logger_set_level(TGS_LOGGER* logger, log_level level);
 
-#endif // LOGGER_H
+TGS_LOGGER* logger_init(char* filename, enum TGS_LOG_LEVEL level);
+void logger_quit();
+
+
+TGS_LOGGER* logger;
+
+
+#endif
