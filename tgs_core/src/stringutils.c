@@ -1,5 +1,6 @@
+#include <string.h>
 #include "stringutils.h"
 
-unsigned char is_empty(char* str) {
+uint8_t str_is_empty(const char* str) {
     return (str == NULL || !(strcmp(str, "")));
 }

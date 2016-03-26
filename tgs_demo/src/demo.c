@@ -5,6 +5,7 @@
 #include "linkedlist.h"
 #include "display.h"
 #include "logger.h"
+#include "config.h"
 #include <sys/time.h>
 
 
@@ -13,7 +14,12 @@ int main(int argc, char** argv) {
     struct timeval stop, start;
     double secs;
     int a = 45;
+    TGS_CONFIG* config = NULL;
 
+    config = config_init();
+    config->add_field(config, "paths", "data00", "/Testing/path/", CFG_TYPE_STRING);
+    config->add_field(config, "paths", "data11", "StringThatIsNotRelated", CFG_TYPE_STRING);
+    config->read(config, "tgs.json");
     logger_init(NULL, LOG_LEVEL_WARN);
     gettimeofday(&start, NULL);
     table->put(table, "17", "seventeen", table->string_create, table->string_destroy);
@@ -43,6 +49,7 @@ int main(int argc, char** argv) {
 
     hashtable_quit(table);
     logger_quit();
+    config_quit(config);
 
     return 0;
 }

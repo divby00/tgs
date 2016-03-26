@@ -1,8 +1,8 @@
 #ifndef __STRINGUTILS_H__
 #define __STRINGUTILS_H__
 
-#include <string.h>
+#include <stdint.h>
 
-unsigned char is_empty(char* str);
+uint8_t str_is_empty(const char* str);
 
-#endif // STRINGUTILS_H
+#endif
