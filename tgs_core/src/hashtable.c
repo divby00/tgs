@@ -132,11 +132,12 @@ static void hashtable_put(TGS_HASHTABLE* hashtable, char* key, void* params_crea
         next = next->next;
     }
 
-    if( next != NULL && next->key != NULL && strcmp(key, next->key) == 0) {
+    if (next != NULL && next->key != NULL && strcmp(key, next->key) == 0) {
         free(next->value);
         next->value = create(params_create);
     } else {
         entry = hashtable_entry_create(key, params_create, create, destroy);
+        hashtable->keys->add(hashtable->keys, key);
         if (next == hashtable->table[hashcode]) {
             entry->next = next;
             hashtable->table[hashcode] = entry;
@@ -156,11 +157,11 @@ static void* hashtable_get(TGS_HASHTABLE* hashtable, char* key) {
     hashcode = hashtable->hash(key, strlen(key));
 
     entry = hashtable->table[hashcode];
-    while(entry != NULL && entry->key != NULL && strcmp(key, entry->key) > 0) {
+    while (entry != NULL && entry->key != NULL && strcmp(key, entry->key) > 0) {
         entry = entry->next;
     }
 
-    if(entry == NULL || entry->key == NULL || strcmp(key, entry->key) != 0) {
+    if (entry == NULL || entry->key == NULL || strcmp(key, entry->key) != 0) {
         return NULL;
     } else {
         return entry->value;
@@ -208,6 +209,8 @@ static TGS_HASHTABLE* hashtable_create(enum TGS_HASHTABLE_SIZE size) {
             hashtable->size = UINT8_MAX + 1;
             hashtable->hash = pearson_hash;
         }
+
+        hashtable->keys = linkedlist_init(hashtable_string_create, hashtable_string_destroy);
 
         hashtable->table = malloc(sizeof(TGS_HASHTABLE_ENTRY*) * hashtable->size);
         if (hashtable->table != NULL) {
@@ -259,6 +262,8 @@ void hashtable_quit(TGS_HASHTABLE* hashtable) {
                 aux = NULL;
             }
         }
+
+        linkedlist_quit(hashtable->keys);
 
         if (hashtable->table != NULL) {
             free(hashtable->table);

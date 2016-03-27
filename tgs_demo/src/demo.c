@@ -17,9 +17,15 @@ int main(int argc, char** argv) {
     TGS_CONFIG* config = NULL;
 
     config = config_init();
-    config->add_field(config, "paths", "data00", "/Testing/path/", CFG_TYPE_STRING);
-    config->add_field(config, "paths", "data11", "StringThatIsNotRelated", CFG_TYPE_STRING);
-    config->read(config, "tgs.json");
+    config->add_field(config, "paths", "data", "./data/", CFG_TYPE_STRING);
+    config->add_field(config, "paths", "lang", "./data/locale/", CFG_TYPE_STRING);
+    config->add_field(config, "graphics", "fullscreen", "false", CFG_TYPE_BOOLEAN);
+    config->add_field(config, "graphics", "width", "640", CFG_TYPE_NUMBER);
+    config->add_field(config, "graphics", "height", "480", CFG_TYPE_NUMBER);
+    config->add_field(config, "control", "keyboard", "true", CFG_TYPE_BOOLEAN);
+    config->add_field(config, "control", "joystick", "false", CFG_TYPE_BOOLEAN);
+    config->save(config, "example.json");
+    config->read(config, "example.json");
     logger_init(NULL, LOG_LEVEL_WARN);
     gettimeofday(&start, NULL);
     table->put(table, "17", "seventeen", table->string_create, table->string_destroy);

@@ -3,6 +3,7 @@
 
 
 #include <stdint.h>
+#include "linkedlist.h"
 
 
 enum TGS_HASHTABLE_SIZE {
@@ -21,6 +22,7 @@ typedef struct TGS_HASHTABLE_ENTRY {
 
 typedef struct TGS_HASHTABLE {
     uint32_t size;
+    TGS_LINKED_LIST* keys;
     TGS_HASHTABLE_ENTRY** table;
     void (*put)(struct TGS_HASHTABLE* hashtable, char* key, void* params_create, void* (*create)(void* params), void (*destroy)(void* params));
     void* (*get)(struct TGS_HASHTABLE* hashtable, char* key);
@@ -39,4 +41,4 @@ TGS_HASHTABLE* hashtable_init_small();
 void hashtable_quit(TGS_HASHTABLE* hashtable);
 
 
-#endif // HASHTABLE_H
+#endif
