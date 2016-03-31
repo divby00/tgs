@@ -100,8 +100,7 @@ static void config_add_field(TGS_CONFIG* config, char* section_name, char* field
 }
 
 
-static void config_save(TGS_CONFIG* config, const char* filename) {
-    FILE* file = NULL;
+static cJSON* config_get_json_from_hashtable(TGS_CONFIG* config) {
     TGS_LINKED_LIST* keylist = config->sections->keys;
     TGS_LINKED_LIST* datalist = NULL;
     TGS_LINKED_LIST_NODE* node = NULL;
@@ -110,7 +109,6 @@ static void config_save(TGS_CONFIG* config, const char* filename) {
     cJSON* root = NULL;
     cJSON* first = NULL;
     char* key = NULL;
-    char* buffer = NULL;
     double number = 0;
     uint8_t boolean = 0;
 
@@ -140,7 +138,18 @@ static void config_save(TGS_CONFIG* config, const char* filename) {
             }
             node = node->next;
         }
+    }
+    return root;
+}
 
+
+static void config_save(TGS_CONFIG* config, const char* filename) {
+    FILE* file = NULL;
+    cJSON* root = NULL;
+    char* buffer = NULL;
+
+    root = config_get_json_from_hashtable(config);
+    if (root != NULL) {
         buffer = cJSON_Print(root);
         if (buffer != NULL) {
             file = fopen(filename, "wt");

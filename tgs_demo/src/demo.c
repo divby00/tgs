@@ -3,6 +3,7 @@
 #include "memmngr.h"
 #include "hashtable.h"
 #include "linkedlist.h"
+#include "fileutils.h"
 #include "display.h"
 #include "logger.h"
 #include "config.h"
@@ -56,6 +57,9 @@ int main(int argc, char** argv) {
     hashtable_quit(table);
     logger_quit();
     config_quit(config);
+
+    char* buf = file_read("tgs_demo");
+    memfree(buf);
 
     return 0;
 }

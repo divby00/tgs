@@ -12,7 +12,8 @@ SOURCES += src/memory.c \
     src/linkedlist.c \
     src/hashtable.c \
     src/json.c \
-    src/memmngr.c
+    src/memmngr.c \
+    src/fileutils.c
 
 HEADERS += \
     src/memory.h \
@@ -21,4 +22,5 @@ HEADERS += \
     src/linkedlist.h \
     src/hashtable.h \
     src/json.h \
-    src/memmngr.h
+    src/memmngr.h \
+    src/fileutils.h
