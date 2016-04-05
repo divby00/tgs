@@ -25,8 +25,39 @@ static void config_read(TGS_CONFIG* config, const char* filename) {
                 config->json = cJSON_Parse(buffer);
 
                 if (config->json != NULL) {
-                    char* b = cJSON_Print(config->json);
-                    free(b);
+                    uint8_t error = 0;
+                    char* key = NULL;
+                    TGS_LINKED_LIST* keylist = config->sections->keys;
+                    TGS_LINKED_LIST* datalist = NULL;
+                    TGS_LINKED_LIST_NODE* node = NULL;
+                    TGS_LINKED_LIST_NODE* datanode = NULL;
+                    TGS_CONFIG_FIELD_DATA* field_data = NULL;
+
+                    node = keylist->node;
+
+                    while (node != NULL) {
+                        key = (char*)node->object;
+                        cJSON* section = cJSON_GetObjectItem(config->json, key);
+                        if (section != NULL) {
+                            datalist = config->sections->get(config->sections, key);
+                            datanode = datalist->node;
+
+                            while (datanode != NULL) {
+                                field_data = datanode->object;
+                                cJSON* obj = cJSON_GetObjectItem(section, field_data->field_name);
+                                if (obj == NULL) {
+                                    error = 1;
+                                }
+                                datanode = datanode->next;
+                            }
+                        }
+                        node = node->next;
+                    }
+
+                    if (error) {
+                        cJSON_Delete(config->json);
+                        config->json = NULL;
+                    }
                 }
                 memfree(buffer);
             }
@@ -148,7 +179,12 @@ static void config_save(TGS_CONFIG* config, const char* filename) {
     cJSON* root = NULL;
     char* buffer = NULL;
 
-    root = config_get_json_from_hashtable(config);
+    if (config->json == NULL) {
+        root = config_get_json_from_hashtable(config);
+    } else {
+        root = config->json;
+    }
+
     if (root != NULL) {
         buffer = cJSON_Print(root);
         if (buffer != NULL) {
@@ -159,6 +195,77 @@ static void config_save(TGS_CONFIG* config, const char* filename) {
             memfree(buffer);
         }
         cJSON_Delete(root);
+        config->json = NULL;
+        root = NULL;
+    }
+}
+
+
+static cJSON* get_json_object(TGS_CONFIG* config, const char* section, const char* field) {
+    cJSON* object = NULL;
+    if (config->json != NULL) {
+        cJSON* obj = cJSON_GetObjectItem(config->json, section);
+        if (obj != NULL) {
+            cJSON* sect = cJSON_GetObjectItem(obj, field);
+            if (sect != NULL) {
+                object = sect;
+            }
+        }
+    }
+    return object;
+}
+
+
+static uint8_t config_get_boolean(TGS_CONFIG* config, const char* section, const char* field) {
+    uint8_t result = 0;
+    cJSON* obj = get_json_object(config, section, field);
+    if (obj != NULL) {
+        result = obj->valueint;
+    }
+    return result;
+}
+
+
+static char* config_get_string(TGS_CONFIG* config, const char* section, const char* field) {
+    char* result = NULL;
+    cJSON* obj = get_json_object(config, section, field);
+    if (obj != NULL) {
+        result = obj->valuestring;
+    }
+    return result;
+}
+
+
+static double config_get_number(TGS_CONFIG* config, const char* section, const char* field) {
+    double result = 0;
+    cJSON* obj = get_json_object(config, section, field);
+    if (obj != NULL) {
+        result = obj->valuedouble;
+    }
+    return result;
+}
+
+
+static void config_set_boolean(TGS_CONFIG* config, const char* section, const char* field, uint8_t value) {
+    cJSON* obj = get_json_object(config, section, field);
+    if (obj != NULL) {
+        obj->valueint = value;
+    }
+}
+
+
+static void config_set_number(TGS_CONFIG* config, const char* section, const char* field, double value) {
+    cJSON* obj = get_json_object(config, section, field);
+    if (obj != NULL) {
+        obj->valuedouble = value;
+    }
+}
+
+
+static void config_set_string(TGS_CONFIG* config, const char* section, const char* field, char* value) {
+    cJSON* obj = get_json_object(config, section, field);
+    if (obj != NULL) {
+        obj->valuestring = value;
     }
 }
 
@@ -170,7 +277,13 @@ TGS_CONFIG* config_init() {
         config->read = config_read;
         config->save = config_save;
         config->add_field = config_add_field;
-        config->sections = hashtable_init();
+        config->sections = hashtable_init_small();
+        config->get_string = config_get_string;
+        config->get_boolean = config_get_boolean;
+        config->get_number = config_get_number;
+        config->set_boolean = config_set_boolean;
+        config->set_number = config_set_number;
+        config->set_string = config_set_string;
     }
     return config;
 }

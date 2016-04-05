@@ -25,8 +25,22 @@ int main(int argc, char** argv) {
     config->add_field(config, "graphics", "height", "480", CFG_TYPE_NUMBER);
     config->add_field(config, "control", "keyboard", "true", CFG_TYPE_BOOLEAN);
     config->add_field(config, "control", "joystick", "false", CFG_TYPE_BOOLEAN);
-    config->save(config, "example.json");
     config->read(config, "example.json");
+
+    fprintf(stdout, "\nControl - Keyboard: %d", config->get_boolean(config, "control", "keyboard"));
+    fprintf(stdout, "\nPaths - Data: %s", config->get_string(config, "paths", "data"));
+    fprintf(stdout, "\nGraphics - Width: %lf", config->get_number(config, "graphics", "width"));
+
+    /*
+    config->set_boolean(config, "control", "keyboard", 0);
+    config->set_number(config, "graphics", "width", 101);
+    config->set_string(config, "paths", "data", "Mierda pa ti un millon de veces en por minuto");
+    fprintf(stdout, "\nControl - Keyboard: %d", config->get_boolean(config, "control", "keyboard"));
+    fprintf(stdout, "\nGraphics - Width: %lf", config->get_number(config, "graphics", "width"));
+    */
+    //fprintf(stdout, "\nPaths - Data: %s", config->get_string(config, "paths", "data"));
+    //config->save(config, "example.json");
+
     logger_init(NULL, LOG_LEVEL_WARN);
     gettimeofday(&start, NULL);
     table->put(table, "17", "seventeen", table->string_create, table->string_destroy);
