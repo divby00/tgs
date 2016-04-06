@@ -1,0 +1,15 @@
+{
+	"paths":	{
+		"data":	"Testing string",
+		"lang":	"./data/locale/"
+	},
+	"graphics":	{
+		"fullscreen":	false,
+		"width":	101,
+		"height":	480
+	},
+	"control":	{
+		"keyboard":	true,
+		"joystick":	false
+	}
+}

@@ -5,7 +5,7 @@
 TGS_DISPLAY* display_init(void) {
     TGS_DISPLAY* display = NULL;
     SDL_Init(SDL_INIT_VIDEO);
-    display = _memalloc(sizeof(struct TGS_DISPLAY));
+    display = memalloc(sizeof(struct TGS_DISPLAY));
     if (display != NULL) {
         display->set_mode = display_set_mode;
     }
@@ -15,9 +15,9 @@ TGS_DISPLAY* display_init(void) {
 void display_quit(TGS_DISPLAY* display) {
     if (display != NULL) {
         if (display->display != NULL) {
-            _memfree(display->display);
+            memfree(display->display);
         }
-        _memfree(display);
+        memfree(display);
     }
 }
 

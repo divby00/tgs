@@ -31,15 +31,15 @@ int main(int argc, char** argv) {
     fprintf(stdout, "\nPaths - Data: %s", config->get_string(config, "paths", "data"));
     fprintf(stdout, "\nGraphics - Width: %lf", config->get_number(config, "graphics", "width"));
 
-    /*
     config->set_boolean(config, "control", "keyboard", 0);
     config->set_number(config, "graphics", "width", 101);
-    config->set_string(config, "paths", "data", "Mierda pa ti un millon de veces en por minuto");
+    config->set_string(config, "paths", "data", "Testing string");
+
     fprintf(stdout, "\nControl - Keyboard: %d", config->get_boolean(config, "control", "keyboard"));
     fprintf(stdout, "\nGraphics - Width: %lf", config->get_number(config, "graphics", "width"));
-    */
-    //fprintf(stdout, "\nPaths - Data: %s", config->get_string(config, "paths", "data"));
-    //config->save(config, "example.json");
+    fprintf(stdout, "\nPaths - Data: %s", config->get_string(config, "paths", "data"));
+
+    config->save(config, "example.json");
 
     logger_init(NULL, LOG_LEVEL_WARN);
     gettimeofday(&start, NULL);

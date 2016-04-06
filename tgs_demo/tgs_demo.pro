@@ -22,4 +22,4 @@ QMAKE_CFLAGS = -pedantic -std=c99 -Wall
 SOURCES += src/demo.c
 
 DISTFILES += \
-    tgs.json
+    example.json

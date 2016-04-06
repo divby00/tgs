@@ -2,66 +2,58 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <malloc.h>
 #include "memory.h"
 #include "stringutils.h"
+#include "fileutils.h"
 #include "json.h"
 #include "config.h"
 
 
 static void config_read(TGS_CONFIG* config, const char* filename) {
     char* buffer = NULL;
-    uint64_t size = 0;
-    FILE* f = NULL;
 
     if (!str_is_empty(filename)) {
-        f = fopen(filename, "rt");
-        if (f != NULL) {
-            fseek(f, 0, SEEK_END);
-            size = ftell(f);
-            fseek(f, 0, SEEK_SET);
-            buffer = memalloc(size);
-            if (buffer != NULL) {
-                fread(buffer, size, 1, f);
-                config->json = cJSON_Parse(buffer);
+        buffer = file_read(filename);
+        if (buffer != NULL) {
+            config->json = cJSON_Parse(buffer);
 
-                if (config->json != NULL) {
-                    uint8_t error = 0;
-                    char* key = NULL;
-                    TGS_LINKED_LIST* keylist = config->sections->keys;
-                    TGS_LINKED_LIST* datalist = NULL;
-                    TGS_LINKED_LIST_NODE* node = NULL;
-                    TGS_LINKED_LIST_NODE* datanode = NULL;
-                    TGS_CONFIG_FIELD_DATA* field_data = NULL;
+            if (config->json != NULL) {
+                uint8_t error = 0;
+                char* key = NULL;
+                TGS_LINKED_LIST* keylist = config->sections->keys;
+                TGS_LINKED_LIST* datalist = NULL;
+                TGS_LINKED_LIST_NODE* node = NULL;
+                TGS_LINKED_LIST_NODE* datanode = NULL;
+                TGS_CONFIG_FIELD_DATA* field_data = NULL;
 
-                    node = keylist->node;
+                node = keylist->node;
 
-                    while (node != NULL) {
-                        key = (char*)node->object;
-                        cJSON* section = cJSON_GetObjectItem(config->json, key);
-                        if (section != NULL) {
-                            datalist = config->sections->get(config->sections, key);
-                            datanode = datalist->node;
+                while (node != NULL) {
+                    key = (char*)node->object;
+                    cJSON* section = cJSON_GetObjectItem(config->json, key);
+                    if (section != NULL) {
+                        datalist = config->sections->get(config->sections, key);
+                        datanode = datalist->node;
 
-                            while (datanode != NULL) {
-                                field_data = datanode->object;
-                                cJSON* obj = cJSON_GetObjectItem(section, field_data->field_name);
-                                if (obj == NULL) {
-                                    error = 1;
-                                }
-                                datanode = datanode->next;
+                        while (datanode != NULL) {
+                            field_data = datanode->object;
+                            cJSON* obj = cJSON_GetObjectItem(section, field_data->field_name);
+                            if (obj == NULL) {
+                                error = 1;
                             }
+                            datanode = datanode->next;
                         }
-                        node = node->next;
                     }
-
-                    if (error) {
-                        cJSON_Delete(config->json);
-                        config->json = NULL;
-                    }
+                    node = node->next;
                 }
-                memfree(buffer);
+
+                if (error) {
+                    cJSON_Delete(config->json);
+                    config->json = NULL;
+                }
             }
-            fclose(f);
+            memfree(buffer);
         }
     }
 }
@@ -263,9 +255,14 @@ static void config_set_number(TGS_CONFIG* config, const char* section, const cha
 
 
 static void config_set_string(TGS_CONFIG* config, const char* section, const char* field, char* value) {
+    char* buffer = NULL;
     cJSON* obj = get_json_object(config, section, field);
+
     if (obj != NULL) {
-        obj->valuestring = value;
+        memfree(obj->valuestring);
+        buffer = memalloc(sizeof(char) * (strlen(value) + 1));
+        strcpy(buffer, value);
+        obj->valuestring = buffer;
     }
 }
 
