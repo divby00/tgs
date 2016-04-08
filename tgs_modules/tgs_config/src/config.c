@@ -14,46 +14,52 @@ static void config_read(TGS_CONFIG* config, const char* filename) {
     char* buffer = NULL;
 
     if (!str_is_empty(filename)) {
-        buffer = file_read(filename);
-        if (buffer != NULL) {
-            config->json = cJSON_Parse(buffer);
+        if (file_exists(filename)) {
+            buffer = file_read(filename);
+            if (buffer != NULL) {
+                config->json = cJSON_Parse(buffer);
 
-            if (config->json != NULL) {
-                uint8_t error = 0;
-                char* key = NULL;
-                TGS_LINKED_LIST* keylist = config->sections->keys;
-                TGS_LINKED_LIST* datalist = NULL;
-                TGS_LINKED_LIST_NODE* node = NULL;
-                TGS_LINKED_LIST_NODE* datanode = NULL;
-                TGS_CONFIG_FIELD_DATA* field_data = NULL;
+                if (config->json != NULL) {
+                    uint8_t error = 0;
+                    char* key = NULL;
+                    TGS_LINKED_LIST* keylist = config->sections->keys;
+                    TGS_LINKED_LIST* datalist = NULL;
+                    TGS_LINKED_LIST_NODE* node = NULL;
+                    TGS_LINKED_LIST_NODE* datanode = NULL;
+                    TGS_CONFIG_FIELD_DATA* field_data = NULL;
 
-                node = keylist->node;
+                    node = keylist->node;
 
-                while (node != NULL) {
-                    key = (char*)node->object;
-                    cJSON* section = cJSON_GetObjectItem(config->json, key);
-                    if (section != NULL) {
-                        datalist = config->sections->get(config->sections, key);
-                        datanode = datalist->node;
+                    while (node != NULL) {
+                        key = (char*)node->object;
+                        cJSON* section = cJSON_GetObjectItem(config->json, key);
+                        if (section != NULL) {
+                            datalist = config->sections->get(config->sections, key);
+                            datanode = datalist->node;
 
-                        while (datanode != NULL) {
-                            field_data = datanode->object;
-                            cJSON* obj = cJSON_GetObjectItem(section, field_data->field_name);
-                            if (obj == NULL) {
-                                error = 1;
+                            while (datanode != NULL) {
+                                field_data = datanode->object;
+                                cJSON* obj = cJSON_GetObjectItem(section, field_data->field_name);
+                                if (obj == NULL) {
+                                    error = 1;
+                                }
+                                datanode = datanode->next;
                             }
-                            datanode = datanode->next;
                         }
+                        node = node->next;
                     }
-                    node = node->next;
-                }
 
-                if (error) {
-                    cJSON_Delete(config->json);
-                    config->json = NULL;
+                    if (error) {
+                        cJSON_Delete(config->json);
+                        config->json = NULL;
+                    }
                 }
+                memfree(buffer);
             }
-            memfree(buffer);
+        } else {
+            if (config->save(config, filename)) {
+                config->read(config, filename);
+            }
         }
     }
 }
@@ -166,10 +172,11 @@ static cJSON* config_get_json_from_hashtable(TGS_CONFIG* config) {
 }
 
 
-static void config_save(TGS_CONFIG* config, const char* filename) {
+static uint8_t config_save(TGS_CONFIG* config, const char* filename) {
     FILE* file = NULL;
     cJSON* root = NULL;
     char* buffer = NULL;
+    uint8_t result = 0;
 
     if (config->json == NULL) {
         root = config_get_json_from_hashtable(config);
@@ -184,12 +191,15 @@ static void config_save(TGS_CONFIG* config, const char* filename) {
             fwrite(buffer, sizeof(char)*(strlen(buffer)), 1, file);
             fflush(file);
             fclose(file);
+            result = 1;
             memfree(buffer);
         }
         cJSON_Delete(root);
         config->json = NULL;
         root = NULL;
     }
+
+    return result;
 }
 
 
@@ -282,6 +292,7 @@ TGS_CONFIG* config_init() {
         config->set_number = config_set_number;
         config->set_string = config_set_string;
     }
+    fprintf(stdout, "\nEstoy en config init");
     return config;
 }
 
@@ -295,4 +306,5 @@ void config_quit(TGS_CONFIG* config) {
         hashtable_quit(config->sections);
         memfree(config);
     }
+    fprintf(stdout, "\nEstoy en config quit");
 }

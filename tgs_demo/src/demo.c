@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "luautils.h"
 #include "memory.h"
 #include "memmngr.h"
 #include "hashtable.h"
@@ -9,6 +10,21 @@
 #include "config.h"
 #include <sys/time.h>
 
+
+int main(void) {
+    int status = 0;
+    lua_State* ls = NULL;
+    ls=luaL_newstate();
+    luaL_openlibs(ls);
+    status = luaL_dofile(ls, "example.lua");
+    if (status) {
+        fprintf(stdout, "\nError");
+    }
+    lua_close(ls);
+    return 0;
+}
+
+/*
 
 int main(int argc, char** argv) {
     TGS_HASHTABLE* table = hashtable_init_small();
@@ -77,3 +93,4 @@ int main(int argc, char** argv) {
 
     return 0;
 }
+*/

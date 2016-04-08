@@ -4,6 +4,7 @@ QMAKE_LIBDIR = /usr/lib/x86_64-linux-gnu
 INCLUDEPATH += ../tgs_core/src
 INCLUDEPATH += ../tgs_modules/tgs_config/src
 INCLUDEPATH += ../tgs_sdl2/src
+INCLUDEPATH += ../tgs_lua/src
 LIBS += ../tgs_lua/libtgs_lua.a
 LIBS += ../tgs_sdl2/libtgs_sdl2.a
 LIBS += ../tgs_modules/tgs_config/libtgs_config.a
@@ -22,4 +23,5 @@ QMAKE_CFLAGS = -pedantic -std=c99 -Wall
 SOURCES += src/demo.c
 
 DISTFILES += \
-    example.json
+    example.json \
+    example.lua

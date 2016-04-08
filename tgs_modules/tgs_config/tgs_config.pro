@@ -11,4 +11,5 @@ SOURCES += \
     src/config.c
 
 HEADERS += \
-    src/config.h
+    src/config.h \
+
