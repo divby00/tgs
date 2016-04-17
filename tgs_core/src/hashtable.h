@@ -24,11 +24,11 @@ typedef struct TGS_HASHTABLE {
     uint32_t size;
     TGS_LINKED_LIST* keys;
     TGS_HASHTABLE_ENTRY** table;
-    void (*put)(struct TGS_HASHTABLE* hashtable, char* key, void* params_create, void* (*create)(void* params), void (*destroy)(void* params));
-    void* (*get)(struct TGS_HASHTABLE* hashtable, char* key);
-    void (*remove)(struct TGS_HASHTABLE* hashtable, char* key);
-    uint8_t (*contains)(struct TGS_HASHTABLE* hashtable, char* key);
-    uint16_t (*hash)(char* key, size_t len);
+    void (*put)(struct TGS_HASHTABLE* hashtable, const char* key, void* params_create, void* (*create)(void* params), void (*destroy)(void* params));
+    void* (*get)(struct TGS_HASHTABLE* hashtable, const char* key);
+    void (*remove)(struct TGS_HASHTABLE* hashtable, const char* key);
+    uint8_t (*contains)(struct TGS_HASHTABLE* hashtable, const char* key);
+    uint16_t (*hash)(const char* key, size_t len);
     void* (*string_create)(void* params);
     void (*string_destroy)(void* params);
     void* (*uint32_create)(void* params);

@@ -17,16 +17,14 @@ typedef struct TGS_LOGGER {
     FILE* file;
     char* filename;
     enum TGS_LOG_LEVEL selected_level;
-    void (*set_level)(enum TGS_LOG_LEVEL level);
-    void (*log)(enum TGS_LOG_LEVEL level, const char* format, ...);
+    void (*set_level)(struct TGS_LOGGER* logger, enum TGS_LOG_LEVEL level);
+    void (*log)(struct TGS_LOGGER* logger, enum TGS_LOG_LEVEL level, const char* format, ...);
 } TGS_LOGGER;
 
 
 TGS_LOGGER* logger_init(char* filename, enum TGS_LOG_LEVEL level);
-void logger_quit();
+void logger_quit(TGS_LOGGER* logger);
 
-
-TGS_LOGGER* logger;
 
 
 #endif

@@ -41,8 +41,11 @@ LUAMOD_API int (luaopen_math) (lua_State *L);
 #define LUA_DBLIBNAME	"debug"
 LUAMOD_API int (luaopen_debug) (lua_State *L);
 
-#define LUA_TGSLIBNAME	"tgs"
-LUAMOD_API int (luaopen_tgs) (lua_State *L);
+#define LUA_TGS_CONTEXT_LIBNAME	"context"
+LUAMOD_API int (luaopen_context) (lua_State *L);
+
+#define LUA_TGS_CONFIG_LIBNAME	"config"
+LUAMOD_API int (luaopen_config) (lua_State *L);
 
 #define LUA_LOADLIBNAME	"package"
 LUAMOD_API int (luaopen_package) (lua_State *L);

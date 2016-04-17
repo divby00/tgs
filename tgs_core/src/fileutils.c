@@ -46,9 +46,9 @@ char* file_read(const char* filename) {
             size = ftell(f);
             fseek(f, 0L, SEEK_SET);
 
-            buffer = malloc(size);
+            buffer = malloc(size + 1);
             if (buffer != NULL) {
-                memset(buffer, 0, size);
+                memset(buffer, 0, size + 1);
                 result = fread(buffer, size, 1, f);
                 if (result != 1) {
                     free(buffer);

@@ -50,7 +50,8 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_MATHLIBNAME, luaopen_math},
   {LUA_UTF8LIBNAME, luaopen_utf8},
   {LUA_DBLIBNAME, luaopen_debug},
-  {LUA_TGSLIBNAME, luaopen_tgs},
+  {LUA_TGS_CONTEXT_LIBNAME, luaopen_context},
+  {LUA_TGS_CONFIG_LIBNAME, luaopen_config},
 #if defined(LUA_COMPAT_BITLIB)
   {LUA_BITLIBNAME, luaopen_bit32},
 #endif

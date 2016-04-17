@@ -4,7 +4,7 @@
 #include "hashtable.h"
 
 
-static uint16_t pearson_hash(char* str, size_t len) {
+static uint16_t pearson_hash(const char* str, size_t len) {
     size_t i;
     static const unsigned char T[256] = {
         59,153, 29,  9,213,167, 84, 93, 30, 46, 94, 75,151,114, 73,222,
@@ -33,7 +33,7 @@ static uint16_t pearson_hash(char* str, size_t len) {
 }
 
 
-static uint16_t bkdr_hash(char* str, size_t len) {
+static uint16_t bkdr_hash(const char* str, size_t len) {
    uint16_t hash = 0;
    size_t i = 0;
    for(i=0; i<len; str++, i++) {
@@ -43,7 +43,7 @@ static uint16_t bkdr_hash(char* str, size_t len) {
 }
 
 
-static TGS_HASHTABLE_ENTRY* hashtable_entry_create(char* key, void* params_create, void* (*create)(void *params), void (*destroy)(void *params)) {
+static TGS_HASHTABLE_ENTRY* hashtable_entry_create(const char* key, void* params_create, void* (*create)(void *params), void (*destroy)(void *params)) {
     TGS_HASHTABLE_ENTRY* entry = NULL;
     if (key != NULL) {
         entry = malloc(sizeof(TGS_HASHTABLE_ENTRY));
@@ -63,7 +63,7 @@ static TGS_HASHTABLE_ENTRY* hashtable_entry_create(char* key, void* params_creat
 }
 
 
-static void hashtable_remove(TGS_HASHTABLE* hashtable, char* key) {
+static void hashtable_remove(TGS_HASHTABLE* hashtable, const char* key) {
     uint16_t hashcode = 0;
     TGS_HASHTABLE_ENTRY* entry = NULL;
     TGS_HASHTABLE_ENTRY* first = NULL;
@@ -119,7 +119,7 @@ static void hashtable_remove(TGS_HASHTABLE* hashtable, char* key) {
 }
 
 
-static void hashtable_put(TGS_HASHTABLE* hashtable, char* key, void* params_create, void* (*create)(void *params), void (*destroy)(void *params)) {
+static void hashtable_put(TGS_HASHTABLE* hashtable, const char* key, void* params_create, void* (*create)(void *params), void (*destroy)(void *params)) {
     uint16_t hashcode = 0;
     TGS_HASHTABLE_ENTRY* entry = NULL;
     TGS_HASHTABLE_ENTRY* next = NULL;
@@ -137,7 +137,7 @@ static void hashtable_put(TGS_HASHTABLE* hashtable, char* key, void* params_crea
         next->value = create(params_create);
     } else {
         entry = hashtable_entry_create(key, params_create, create, destroy);
-        hashtable->keys->add(hashtable->keys, key);
+        hashtable->keys->add(hashtable->keys, (void*)key);
         if (next == hashtable->table[hashcode]) {
             entry->next = next;
             hashtable->table[hashcode] = entry;
@@ -151,7 +151,7 @@ static void hashtable_put(TGS_HASHTABLE* hashtable, char* key, void* params_crea
 }
 
 
-static void* hashtable_get(TGS_HASHTABLE* hashtable, char* key) {
+static void* hashtable_get(TGS_HASHTABLE* hashtable, const char* key) {
     uint16_t hashcode = 0;
     TGS_HASHTABLE_ENTRY* entry = NULL;
     hashcode = hashtable->hash(key, strlen(key));
@@ -170,7 +170,7 @@ static void* hashtable_get(TGS_HASHTABLE* hashtable, char* key) {
 
 
 static void* hashtable_string_create(void* params) {
-    char* buffer = NULL;
+    const char* buffer = NULL;
     if (params != NULL) {
         buffer = malloc(sizeof(char) * (strlen(params) + 1));
         if (buffer != NULL) {
@@ -190,7 +190,7 @@ static void hashtable_string_destroy(void* params) {
 }
 
 
-static uint8_t hashtable_contains(TGS_HASHTABLE* hashtable, char *key) {
+static uint8_t hashtable_contains(TGS_HASHTABLE* hashtable, const char *key) {
     return (hashtable->get(hashtable, key) != NULL);
 }
 

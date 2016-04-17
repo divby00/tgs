@@ -7,7 +7,8 @@ CONFIG += console debug staticlib
 QMAKE_CFLAGS = -pedantic -std=c99 -Wall
 INCLUDEPATH += ../tgs_core/src
 INCLUDEPATH += ../tgs_modules/tgs_config/src
-INCLUDEPATH += ../tgs_sdl2/src
+INCLUDEPATH += ../tgs_modules/tgs_display/src
+INCLUDEPATH += ../tgs_context/src
 
 SOURCES += src/lapi.c \
     src/lcode.c \

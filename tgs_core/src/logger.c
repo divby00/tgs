@@ -6,12 +6,12 @@
 #include "logger.h"
 
 
-static void logger_set_level(enum TGS_LOG_LEVEL level) {
+static void logger_set_level(TGS_LOGGER* logger, enum TGS_LOG_LEVEL level) {
     logger->selected_level = level;
 }
 
 
-static void logger_log(enum TGS_LOG_LEVEL level, const char* format, ...) {
+static void logger_log(TGS_LOGGER* logger, enum TGS_LOG_LEVEL level, const char* format, ...) {
     va_list args;
     struct timeval tv;
     struct tm *tm;
@@ -50,7 +50,7 @@ static void logger_log(enum TGS_LOG_LEVEL level, const char* format, ...) {
 
 
 TGS_LOGGER* logger_init(char* filename, enum TGS_LOG_LEVEL level) {
-    logger = NULL;
+    TGS_LOGGER* logger = NULL;
     logger = malloc(sizeof(TGS_LOGGER));
 
     if (logger != NULL) {
@@ -78,7 +78,7 @@ TGS_LOGGER* logger_init(char* filename, enum TGS_LOG_LEVEL level) {
 }
 
 
-void logger_quit() {
+void logger_quit(TGS_LOGGER* logger) {
     if (logger != NULL) {
         if (logger->filename != NULL && strcmp(logger->filename, "")) {
             if (logger->file != NULL) {

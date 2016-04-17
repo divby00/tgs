@@ -20,11 +20,11 @@
     #define EXPORT
 #endif
 
-
 EXPORT int lua_config_init(lua_State* ls);
 EXPORT int lua_config_quit(lua_State* ls);
 EXPORT int lua_config_read(lua_State* ls);
 EXPORT int lua_config_save(lua_State* ls);
-
+EXPORT int lua_context_get_config(lua_State* ls);
+EXPORT int lua_context_get_logger(lua_State* ls);
 
 #endif

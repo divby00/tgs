@@ -4,3 +4,4 @@ CONFIG -= qt
 CONFIG += console
 CONFIG += debug
 SUBDIRS = tgs_config \
+    tgs_display \
