@@ -14,7 +14,7 @@ EXPORT int lua_context_init(lua_State* ls) {
 
 EXPORT int lua_context_quit(lua_State* ls) {
     TGS_CONTEXT* context = NULL;
-    if (lua_isuserdata(ls, 1)) {
+    if (lua_islightuserdata(ls, 1)) {
         context = lua_touserdata(ls, 1);
         context_quit(context);
     }
@@ -27,7 +27,7 @@ EXPORT int lua_context_get_config(lua_State* ls) {
     TGS_CONFIG* cfg = NULL;
 
     if (ls != NULL) {
-        if (lua_isuserdata(ls, 1)) {
+        if (lua_islightuserdata(ls, 1)) {
             ctx = lua_touserdata(ls, 1);
             if (ctx != NULL) {
                 cfg = ctx->config;
@@ -108,7 +108,7 @@ EXPORT int lua_config_add_field(lua_State* ls) {
     const char* field_value = NULL;
     enum TGS_CONFIG_TYPES field_type;
 
-    if (lua_isuserdata(ls, 1) && lua_isstring(ls, 2) && lua_isstring(ls, 3) && lua_isstring(ls, 4) && lua_isfunction(ls, 5)) {
+    if (lua_isuserdata(ls, 1) && lua_isstring(ls, 2) && lua_isstring(ls, 3) && lua_isstring(ls, 4) && lua_isnumber(ls, 5)) {
         config = lua_touserdata(ls, 1);
         section_name = lua_tostring(ls, 2);
         field_name = lua_tostring(ls, 3);
@@ -123,12 +123,12 @@ EXPORT int lua_config_add_field(lua_State* ls) {
 
 
 static const luaL_Reg tgs_config_lib[] = {
-    {"TYPE_BOOLEAN", CFG_TYPE_BOOLEAN},
-    {"TYPE_NUMBER", CFG_TYPE_NUMBER},
-    {"TYPE_STRING", CFG_TYPE_STRING},
     {"read", lua_config_read},
     {"save", lua_config_save},
     {"add_field", lua_config_add_field},
+    {"TYPE_BOOLEAN", NULL},
+    {"TYPE_NUMBER", NULL},
+    {"TYPE_STRING", NULL},
     {NULL, NULL}
 };
 
@@ -136,6 +136,12 @@ static const luaL_Reg tgs_config_lib[] = {
 LUAMOD_API int luaopen_config(lua_State* ls) {
     if (ls != NULL) {
         luaL_newlib(ls, tgs_config_lib);
+        lua_pushnumber(ls, CFG_TYPE_BOOLEAN);
+        lua_setfield(ls, -2, "TYPE_BOOLEAN");
+        lua_pushnumber(ls, CFG_TYPE_NUMBER);
+        lua_setfield(ls, -2, "TYPE_NUMBER");
+        lua_pushnumber(ls, CFG_TYPE_STRING);
+        lua_setfield(ls, -2, "TYPE_STRING");
     }
     return 1;
 }

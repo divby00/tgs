@@ -1,5 +1,7 @@
 #!/usr/bin/env lua
 
+local Context = require 'Context'
+
 function vardump(value, depth, key)
     local linePrefix = ''
     local spaces = ''
@@ -33,23 +35,8 @@ function vardump(value, depth, key)
     end
 end
 
--- Lua test
---vardump(context)
+ctx = Context:new()
+ctx:quit()
 
-print('In!')
-local ctx = context.init()
-local cfg = context.get_config(ctx)
-local log = context.get_logger(ctx)
-config.add_field(cfg, "paths", "data", "./data/", config.TYPE_STRING);
-config.add_field(cfg, "paths", "lang", "./data/locale/", config.TYPE_STRING);
-config.add_field(cfg, "graphics", "fullscreen", "false", config.TYPE_BOOLEAN);
-config.add_field(cfg, "graphics", "width", "640", config.TYPE_NUMBER);
-config.add_field(cfg, "graphics", "height", "480", config.TYPE_NUMBER);
-config.add_field(cfg, "control", "keyboard", "true", config.TYPE_BOOLEAN);
-config.add_field(cfg, "control", "joystick", "false", config.TYPE_BOOLEAN);
-config.add_field(cfg, "graphics", "height", "480", config.TYPE_NUMBER)
-config.read(cfg, "example.json")
-context.quit(ctx)
-print('Out!')
-
+print('Exit ok')
 

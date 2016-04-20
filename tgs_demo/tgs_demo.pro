@@ -27,4 +27,6 @@ SOURCES += src/demo.c
 
 DISTFILES += \
     example.json \
-    example.lua
+    example.lua \
+    Config.lua \
+    Context.lua
