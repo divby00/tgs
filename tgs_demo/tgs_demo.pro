@@ -29,4 +29,5 @@ DISTFILES += \
     example.json \
     example.lua \
     Config.lua \
-    Context.lua
+    Context.lua \
+    Logger.lua

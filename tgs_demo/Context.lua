@@ -1,19 +1,23 @@
 local Config = require 'Config'
+local Logger = require 'Logger'
 
 local Context = {}
 Context.__index = Context
 
 function Context:new()
     ctx = context.init()
-    cfg = context.get_config(ctx)
+    Config = Config:new(ctx)
+    Logger = Logger:new(ctx)
+
     return setmetatable({
         ctx = ctx,
-        cfg = cfg
+        Config = Config,
+        Logger = Logger
     }, Context)
+
 end
 
 function Context:quit()
-    print(self.ctx)
     context.quit(self.ctx)
 end
 

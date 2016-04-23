@@ -36,6 +36,8 @@ function vardump(value, depth, key)
 end
 
 ctx = Context:new()
+ctx.Config:read('example.json')
+ctx.Logger:log(logger.LEVEL_DEBUG, 'Prueba')
 ctx:quit()
 
 print('Exit ok')

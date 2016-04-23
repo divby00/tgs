@@ -52,6 +52,7 @@ static const luaL_Reg loadedlibs[] = {
   {LUA_DBLIBNAME, luaopen_debug},
   {LUA_TGS_CONTEXT_LIBNAME, luaopen_context},
   {LUA_TGS_CONFIG_LIBNAME, luaopen_config},
+  {LUA_TGS_LOGGER_LIBNAME, luaopen_logger},
 #if defined(LUA_COMPAT_BITLIB)
   {LUA_BITLIBNAME, luaopen_bit32},
 #endif

@@ -47,6 +47,9 @@ LUAMOD_API int (luaopen_context) (lua_State *L);
 #define LUA_TGS_CONFIG_LIBNAME	"config"
 LUAMOD_API int (luaopen_config) (lua_State *L);
 
+#define LUA_TGS_LOGGER_LIBNAME	"logger"
+LUAMOD_API int (luaopen_logger) (lua_State *L);
+
 #define LUA_LOADLIBNAME	"package"
 LUAMOD_API int (luaopen_package) (lua_State *L);
 
