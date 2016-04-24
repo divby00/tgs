@@ -1,6 +1,3 @@
-#!/usr/bin/env lua
-
-
 local Context = require 'Context'
 
 

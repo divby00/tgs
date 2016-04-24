@@ -29,7 +29,7 @@ typedef struct TGS_CONFIG {
     uint8_t (*save)(struct TGS_CONFIG*, const char* filename);
     void (*set_boolean)(struct TGS_CONFIG*, const char* section, const char* field, uint8_t value);
     void (*set_number)(struct TGS_CONFIG*, const char* section, const char* field, double value);
-    void (*set_string)(struct TGS_CONFIG*, const char* section, const char* field, char* value);
+    void (*set_string)(struct TGS_CONFIG*, const char* section, const char* field, const char* value);
     uint8_t (*get_boolean)(struct TGS_CONFIG*, const char* section, const char* field);
     double (*get_number)(struct TGS_CONFIG*, const char* section, const char* field);
     char* (*get_string)(struct TGS_CONFIG*, const char* section, const char* field);

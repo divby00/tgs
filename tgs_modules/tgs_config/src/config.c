@@ -120,7 +120,7 @@ void config_add_field(TGS_CONFIG* config, const char* section_name, const char* 
 
 
 
-cJSON* get_json_object(TGS_CONFIG* config, const char* section, const char* field) {
+static cJSON* get_json_object(TGS_CONFIG* config, const char* section, const char* field) {
     cJSON* object = NULL;
     if (config->json != NULL) {
         cJSON* obj = cJSON_GetObjectItem(config->json, section);
@@ -181,7 +181,7 @@ void config_set_number(TGS_CONFIG* config, const char* section, const char* fiel
 }
 
 
-void config_set_string(TGS_CONFIG* config, const char* section, const char* field, char* value) {
+void config_set_string(TGS_CONFIG* config, const char* section, const char* field, const char* value) {
     char* buffer = NULL;
     cJSON* obj = get_json_object(config, section, field);
 

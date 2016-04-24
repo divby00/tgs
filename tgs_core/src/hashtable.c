@@ -170,7 +170,7 @@ static void* hashtable_get(TGS_HASHTABLE* hashtable, const char* key) {
 
 
 static void* hashtable_string_create(void* params) {
-    const char* buffer = NULL;
+    char* buffer = NULL;
     if (params != NULL) {
         buffer = malloc(sizeof(char) * (strlen(params) + 1));
         if (buffer != NULL) {

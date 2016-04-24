@@ -33,17 +33,36 @@ SOURCES += src/lapi.c \
     src/lauxlib.c \
     src/lbaselib.c \
     src/lbitlib.c \
-    src/lcorolib.c \
-    src/ldblib.c \
-    src/liolib.c \
-    src/lmathlib.c \
-    src/loslib.c \
-    src/lstrlib.c \
     src/ltablib.c \
-    src/lutf8lib.c \
     src/loadlib.c \
     src/linit.c \
-    src/luautils.c
+    src/luautils.c \
+    src/lauxlib.h
+
 
 HEADERS += \
-    src/luautils.h
+    src/luautils.h \
+    src/lcode.h \
+    src/lctype.h \
+    src/ldebug.h \
+    src/ldo.h \
+    src/lfunc.h \
+    src/lgc.h \
+    src/llex.h \
+    src/llimits.h \
+    src/lmem.h \
+    src/lobject.h \
+    src/lopcodes.h \
+    src/lparser.h \
+    src/lprefix.h \
+    src/lstate.h \
+    src/lstring.h \
+    src/ltable.h \
+    src/ltm.h \
+    src/luaconf.h \
+    src/lua.h \
+    src/lualib.h \
+    src/luautils.h \
+    src/lundump.h \
+    src/lvm.h \
+    src/lzio.h
