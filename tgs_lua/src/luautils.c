@@ -183,10 +183,73 @@ EXPORT int lua_config_add_field(lua_State* ls) {
 }
 
 
+EXPORT int lua_config_get_boolean(lua_State* ls) {
+    TGS_CONFIG* config = NULL;
+    const char* section_name = NULL;
+    const char* field_name = NULL;
+    uint8_t result = 0;
+
+    if (lua_isuserdata(ls, 1) && lua_isstring(ls, 2) && lua_isstring(ls, 3)) {
+        config = lua_touserdata(ls, 1);
+        section_name = lua_tostring(ls, 2);
+        field_name = lua_tostring(ls, 3);
+        result = config->get_boolean(config, section_name, field_name);
+        lua_pushboolean(ls, result);
+        return 1;
+    } else {
+        luaL_error(ls, "Wrong parameters calling backend in function %s", __FUNCTION__);
+    }
+    return 0;
+}
+
+
+EXPORT int lua_config_get_number(lua_State* ls) {
+    TGS_CONFIG* config = NULL;
+    const char* section_name = NULL;
+    const char* field_name = NULL;
+    double result = 0;
+
+    if (lua_isuserdata(ls, 1) && lua_isstring(ls, 2) && lua_isstring(ls, 3)) {
+        config = lua_touserdata(ls, 1);
+        section_name = lua_tostring(ls, 2);
+        field_name = lua_tostring(ls, 3);
+        result = config->get_number(config, section_name, field_name);
+        lua_pushnumber(ls, result);
+        return 1;
+    } else {
+        luaL_error(ls, "Wrong parameters calling backend in function %s", __FUNCTION__);
+    }
+    return 0;
+}
+
+
+EXPORT int lua_config_get_string(lua_State* ls) {
+    TGS_CONFIG* config = NULL;
+    const char* section_name = NULL;
+    const char* field_name = NULL;
+    const char* buffer = NULL;
+
+    if (lua_isuserdata(ls, 1) && lua_isstring(ls, 2) && lua_isstring(ls, 3)) {
+        config = lua_touserdata(ls, 1);
+        section_name = lua_tostring(ls, 2);
+        field_name = lua_tostring(ls, 3);
+        buffer = config->get_string(config, section_name, field_name);
+        lua_pushstring(ls, buffer);
+        return 1;
+    } else {
+        luaL_error(ls, "Wrong parameters calling backend in function %s", __FUNCTION__);
+    }
+    return 0;
+}
+
+
 static const luaL_Reg tgs_config_lib[] = {
     {"read", lua_config_read},
     {"save", lua_config_save},
     {"add_field", lua_config_add_field},
+    {"get_boolean", lua_config_get_boolean},
+    {"get_number", lua_config_get_number},
+    {"get_string", lua_config_get_string},
     {"TYPE_BOOLEAN", NULL},
     {"TYPE_NUMBER", NULL},
     {"TYPE_STRING", NULL},

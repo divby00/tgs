@@ -16,7 +16,7 @@ int main(void) {
     lua_State* ls = NULL;
     ls=luaL_newstate();
     luaL_openlibs(ls);
-    status = luaL_dofile(ls, "example.lua");
+    status = luaL_dofile(ls, "demo.bin");
     if (status) {
         fprintf(stdout, "\n--------------------- ");
         fprintf(stdout, "\nError code %d", status);

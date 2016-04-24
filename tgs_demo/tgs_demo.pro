@@ -26,8 +26,7 @@ QMAKE_CFLAGS = -pedantic -std=c99 -Wall
 SOURCES += src/demo.c
 
 DISTFILES += \
-    example.json \
-    example.lua \
     Config.lua \
     Context.lua \
-    Logger.lua
+    Logger.lua \
+    demo.lua
