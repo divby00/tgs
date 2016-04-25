@@ -30,3 +30,6 @@ DISTFILES += \
     Context.lua \
     Logger.lua \
     demo.lua
+
+HEADERS += \
+    src/tgs_config.h

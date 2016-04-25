@@ -36,8 +36,11 @@ SOURCES += src/lapi.c \
     src/ltablib.c \
     src/loadlib.c \
     src/linit.c \
-    src/luautils.c \
-    src/lauxlib.h
+    src/tgs_context.c \
+    src/tgs_config.c \
+    src/tgs_logger.c \
+    src/tgs_logger.c
+
 
 
 HEADERS += \
@@ -65,4 +68,9 @@ HEADERS += \
     src/luautils.h \
     src/lundump.h \
     src/lvm.h \
-    src/lzio.h
+    src/lzio.h \
+    src/lauxlib.h \
+    src/tgs_context.h \
+    src/tgs_config.h \
+    src/tgs_logger.h \
+    src/tgs_logger.h

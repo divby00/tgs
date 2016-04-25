@@ -21,25 +21,4 @@
 #endif
 
 
-// Configuration
-EXPORT int lua_config_init(lua_State* ls);
-EXPORT int lua_config_quit(lua_State* ls);
-EXPORT int lua_config_read(lua_State* ls);
-EXPORT int lua_config_save(lua_State* ls);
-EXPORT int lua_config_add_field(lua_State* ls);
-EXPORT int lua_config_get_boolean(lua_State* ls);
-EXPORT int lua_config_get_number(lua_State* ls);
-EXPORT int lua_config_get_string(lua_State* ls);
-EXPORT int lua_config_set_boolean(lua_State* ls);
-EXPORT int lua_config_set_number(lua_State* ls);
-EXPORT int lua_config_set_string(lua_State* ls);
-
-// Logger
-EXPORT int lua_logger_log(lua_State* ls);
-EXPORT int lua_logger_set_level(lua_State* ls);
-
-// Context
-EXPORT int lua_context_get_config(lua_State* ls);
-EXPORT int lua_context_get_logger(lua_State* ls);
-
 #endif
